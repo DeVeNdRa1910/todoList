@@ -1,12 +1,24 @@
+import { useQueries, useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 
+async function getTasks() {
+  const data = await axios.get("http://localhost:3000/tasks") 
+  return data;
+}
 function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [editingTask, setEditingTask] = useState(null);
-  const [editedTask, setEditedTask] = useState('');
+  const [editedTask, setEditedTask] = useState();
+
+  const {data, isLoading} = useQuery({
+    queryKey: ["Tasks"],
+    queryFn: getTasks
+  })
 
   useEffect(() => {
+    console.log(data)
     const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
     setTasks(savedTasks);
   }, []);
@@ -23,7 +35,7 @@ function App() {
       return;
     }
     const updatedTasks = [...tasks, newTask];
-    console.log( "added tasks "+updatedTasks);
+    console.log( "added tasks " + updatedTasks);
     
     setTasks(updatedTasks);
     setNewTask('');
@@ -35,7 +47,6 @@ function App() {
     console.log( "delete tasks "+updatedTasks);
     setTasks(updatedTasks);
   };
-
   
   const startEditing = (task, index) => {
     setEditingTask(index);
@@ -45,7 +56,7 @@ function App() {
   const saveEditedTask = () => {
     const updatedTasks = [...tasks];
     updatedTasks[editingTask] = editedTask;
-    console.log( "updated tasks "+updatedTasks);
+    console.log( "updated tasks " + updatedTasks);
     setTasks(updatedTasks);
     setEditingTask(null);
     setEditedTask('');

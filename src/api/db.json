@@ -1,0 +1,9 @@
+{
+    "tasks": [
+        {
+            "id": "1",
+            "isComplete": false,
+            "task": "learn about json-server"
+        }
+    ]
+}

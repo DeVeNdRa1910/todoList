@@ -1,0 +1,72 @@
+{
+    "tasks": [
+        {
+            "id": "1",
+            "isCompleted": false,
+            "task": "task one"
+        },
+        {
+            "id": "2",
+            "isCompleted": false,
+            "task": "task two"
+        },
+        {
+            "id": "3",
+            "isCompleted": false,
+            "task": "task three"
+        },
+        {
+            "id": "4",
+            "isCompleted": false,
+            "task": "task four"
+        },
+        {
+            "id": "5",
+            "isCompleted": false,
+            "task": "task five"
+        },
+        {
+            "id": "6",
+            "isCompleted": false,
+            "task": "six"
+        }
+    ],
+    "users": [
+        {
+        "id": 1,
+        "name": "Juliet Oma",
+        "email": "julie@yahoo.com",
+        "number": "08100000000"
+        },
+        {
+        "id": 2,
+        "name": "James Williams",
+        "email": "jameswilly@gmail.com",
+        "number": "08111111111"
+        },
+        {
+        "id": 3,
+        "name": "Ahmed Ali",
+        "email": "ahmedali012@gmail.com",
+        "number": "09022222222"
+        },
+        {
+        "id": 4,
+        "name": "Grace Funsho",
+        "email": "gracefunsho@gmail.com",
+        "number": "09033333333"
+        }
+    ],
+    "posts": [
+      { "id": "1", "title": "a title", "views": 100 },
+      { "id": "2", "title": "another title", "views": 200 }
+    ],
+    "comments": [
+      { "id": "1", "text": "a comment about post 1", "postId": "1" },
+      { "id": "2", "text": "another comment about post 1", "postId": "1" },
+      { "id": "3", "text": "Hello Brother", "postId":"2"}
+    ],
+    "profile": {
+      "name": "typicode"
+    }
+}
