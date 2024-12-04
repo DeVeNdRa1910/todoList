@@ -19,8 +19,6 @@ function App() {
       setTasks(resp.data)
     }
     getTasks()
-
-    setTasks(savedTasks);
   },[isLoading]);
 
   async function addTask() {
@@ -58,6 +56,29 @@ function App() {
 
   const startEditing = (id, task) => {
     
+  const addTask = () => {
+    if (newTask.trim() === "") {
+      alert("Input Field is empty");
+      return;
+    }
+
+    const taskObj = {
+      id: Date.now(),
+      isComplete: false,
+      task: newTask,
+    };
+
+    const updatedTask = [...tasks, taskObj];
+    setTasks(updatedTask);
+    setNewTask("");
+  };
+
+  const deleteTask = (id) => {
+    const updatedTasks = tasks.filter((item) => item.id !== id);
+    setTasks(updatedTasks);
+  };
+
+  const startEditing = (id, task) => {
     let index = tasks.findIndex((item) => item.id === id);
     setEditingTask(index);
     const taskObj = {
@@ -144,6 +165,7 @@ function App() {
                     <button className="bg-black hover:shadow-lg hover:shadow-green-500 text-2xl text-green px-6 py-2  rounded-lg mr-4 transition-all" onClick={() => startEditing(item.id, item.task)}> <FaEdit /> </button>
                     <button className="bg-black hover:shadow-lg hover:shadow-red-500 text-red text-2xl px-6 py-2  rounded-lg transition-all" onClick={() => deleteTask(item.id)}> <RiDeleteBin6Fill /> </button>
                   </div>
+
                 )}
               </div>
             );
