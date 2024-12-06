@@ -1,24 +1,61 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import { FaEdit } from 'react-icons/fa';
+import { RiDeleteBin6Fill } from 'react-icons/ri';
+import { TfiSave } from 'react-icons/tfi';
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [editingTask, setEditingTask] = useState(null);
   const [editedTask, setEditedTask] = useState(null);
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const savedTasks = JSON.parse(localStorage.getItem("taskObject")) || [];
-    setTasks(savedTasks);
-  }, []);
-
-  useEffect(() => {
-    if (tasks.length > 0) {
-      localStorage.setItem("taskObject", JSON.stringify(tasks));
-    } else {
-      localStorage.removeItem("taskObject");
+    async function getTasks(){
+      const resp = await axios.get("http://localhost:3000/tasks")     
+      setTasks(resp.data)
     }
-  }, [tasks]);
+    getTasks()
+  },[isLoading]);
 
+  async function addTask() {
+    setIsLoading(true)
+    if (newTask.trim() === "") {
+      alert("Input Field is empty");
+      return;
+    }
+
+    const taskObj = {
+      id: String(Date.now()),
+      isComplete: false,
+      task: newTask,
+    };
+
+    try {
+      const resp = await axios.post("http://localhost:3000/tasks", taskObj)
+    } catch (error){
+      console.log(error);
+    }
+    setNewTask('')
+    setIsLoading(false)
+  };
+
+  async function deleteTask(id) {
+    setIsLoading(true)
+    try {
+      const resp = await axios.delete(`http://localhost:3000/tasks/${id}`);
+      console.log(resp.data)
+    } catch (error) {
+      console.log(error);
+    }
+    setIsLoading(false)
+  };
+
+  const startEditing = (id, task) => {
+    
   const addTask = () => {
     if (newTask.trim() === "") {
       alert("Input Field is empty");
@@ -52,26 +89,36 @@ function App() {
     setEditedTask(taskObj);
   };
 
-  const toggleCompletion = (id) => {
-    const updatedTasks = tasks.map((item) =>
-      item.id === id ? { ...item, isComplete: !item.isComplete } : item
-    );
-    setTasks(updatedTasks);
-  };
-
-  const saveEditedTask = () => {
-    const updatedTasks = [...tasks];
-    updatedTasks[editingTask] = editedTask;
-    setTasks(updatedTasks);
+  async function saveEditedTask (id) {
+    setIsLoading(true)
+    try {
+      const resp = await axios.put(`http://localhost:3000/tasks/${id}`, editedTask)
+    } catch (error) {
+      console.log(error);
+    }
+    setIsLoading(false)
     setEditingTask(null);
     setEditedTask(null);
+  };
+
+  async function toggleCompletion(id) {
+    setIsLoading(true)
+    const resp = await axios.get(`http://localhost:3000/tasks/${id}`)
+    let task = resp.data;
+    console.log(task)
+   try {
+      const resp = await axios.put(`http://localhost:3000/tasks/${id}`, {...task, isComplete: !task.isComplete})
+   } catch (error) {
+      console.log(error)
+   }
+   setIsLoading(false)
   };
 
   return (
     <>
       <div className="w-[100vw] min-h-[100vh] bg-black text-white">
         <div className="w-full h-[8vh] flex items-center justify-center shadow-md shadow-orange-500">
-          <h1 className="text-5xl font-bold text-orange-500">TO DO List</h1>
+          <h1 className="text-5xl font-bold text-orange-500">Task's List</h1>
         </div>
         
         <div className="h-[20vh] w-[70vw] flex items-center justify-center mx-auto">
@@ -83,7 +130,11 @@ function App() {
               value={newTask}
               onChange={(e) => setNewTask(e.target.value)}
             />
-            <button onClick={addTask} className="bg-orange-500 text-2xl px-6 py-2 rounded-lg ml-3" >Add</button>
+            <button onClick={addTask} className="bg-orange-500 text-2xl px-6 py-2 rounded-lg ml-3" >
+              {
+                isLoading ? < AiOutlineLoading3Quarters className='animate-spin text-2xl px-6 py-2' /> : "Add"
+              }
+            </button>
           </div>
         </div>
 
@@ -100,10 +151,10 @@ function App() {
                       onChange={(e) => setEditedTask({ ...editedTask, task: e.target.value })
                       }
                     />
-                    <button onClick={saveEditedTask} className="bg-black hover:shadow-lg hover:shadow-green-500 text-2xl text-green px-6 py-2 rounded-lg mr-4 transition-all" > <TfiSave /> </button>
+                    <button onClick={()=>saveEditedTask(item.id)} className="bg-black hover:shadow-lg hover:shadow-green-500 text-2xl text-green px-6 py-2 rounded-lg mr-4 transition-all" > <TfiSave /> </button>
                   </div>
                 ) : (
-                  <div key={item.id} className="h-[8vh] mb-3 px-4 rounded-lg flex items-center shadow-lg shadow-orange-500">
+                  <div key={item.id} className={`h-[8vh] mb-3 px-4 rounded-lg flex items-center shadow-lg  ${item.isComplete ? `shadow-blue-500` : `shadow-orange-500`}`}>
                     <input
                       type="checkbox"
                       className="h-5 w-5 bg-orange-500 rounded-md "
@@ -114,6 +165,7 @@ function App() {
                     <button className="bg-black hover:shadow-lg hover:shadow-green-500 text-2xl text-green px-6 py-2  rounded-lg mr-4 transition-all" onClick={() => startEditing(item.id, item.task)}> <FaEdit /> </button>
                     <button className="bg-black hover:shadow-lg hover:shadow-red-500 text-red text-2xl px-6 py-2  rounded-lg transition-all" onClick={() => deleteTask(item.id)}> <RiDeleteBin6Fill /> </button>
                   </div>
+
                 )}
               </div>
             );
